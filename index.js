@@ -1,3 +1,5 @@
+const http = require('http');
+
 const {
     Client,
     GatewayIntentBits,
@@ -17,7 +19,7 @@ const client = new Client({
     intents: [GatewayIntentBits.Guilds]
 });
 
-// Nicks-base para criar combinações diferentes
+// Nicks para criar combinações diferentes
 const partes1 = [
     'zy', 'xe', 'ky', 'va', 'no', 'ze', 'lu', 'ry', 'vi', 'ka',
     'xa', 'ny', 'sy', 'vo', 'zi', 'ke', 'my', 'ay', 're', 'ix',
@@ -72,7 +74,9 @@ function criarEmbed() {
     return new EmbedBuilder()
         .setTitle('🔎 Nicks sugeridos')
         .setDescription(
-            nicks.map((nick, index) => `**${index + 1}.** \`${nick}\``).join('\n')
+            nicks
+                .map((nick, index) => `**${index + 1}.** \`${nick}\``)
+                .join('\n')
         )
         .setFooter({
             text: 'Clique em 🔄 Gerar novamente para novos nicks'
@@ -126,13 +130,22 @@ client.on('interactionCreate', async interaction => {
 
     if (interaction.isButton()) {
         if (interaction.customId === 'gerar_nicks') {
-
             await interaction.update({
                 embeds: [criarEmbed()],
                 components: [criarBotoes()]
             });
         }
     }
+});
+
+// Servidor HTTP necessário para o Render
+const server = http.createServer((req, res) => {
+    res.writeHead(200);
+    res.end('Botnicks online!');
+});
+
+server.listen(process.env.PORT || 3000, '0.0.0.0', () => {
+    console.log('🌐 Servidor web iniciado!');
 });
 
 client.login(TOKEN);
